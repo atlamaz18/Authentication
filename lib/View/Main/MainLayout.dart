@@ -1,6 +1,9 @@
+import 'package:authentication/View/Main/Settings.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../Welcome/WelcomeLayout.dart';
+import 'package:local_auth/local_auth.dart';
+
 
 class MainLayout extends StatelessWidget {
   const MainLayout({super.key});
@@ -8,6 +11,7 @@ class MainLayout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
+    bool authenticated = false;
 
     return Scaffold(
       body: SafeArea(
@@ -45,7 +49,7 @@ class MainLayout extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                       builder: (context) {
-                        return const WelcomeLayout();
+                        return const Settings();
                       },
                     ),
                   );
@@ -68,7 +72,7 @@ class MainLayout extends StatelessWidget {
                             color: Color(0XFFF8F8F8),
                             fontWeight: FontWeight.normal))
                   ],
-                ))
+                ),),
           ],
         ),
       ),
