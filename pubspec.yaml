@@ -39,6 +39,9 @@ dependencies:
   google_fonts: 2.1.0
   settings_ui: ^2.0.2
   local_auth: ^2.1.6
+  geolocator: ^9.0.2
+  http: ^0.13.0
+  intl: ^0.18.1
 dev_dependencies:
   flutter_test:
     sdk: flutter

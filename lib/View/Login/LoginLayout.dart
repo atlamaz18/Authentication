@@ -1,9 +1,12 @@
+import 'package:authentication/View/Main/LocationCheck.dart';
 import 'package:authentication/View/Main/MainLayout.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'dart:convert';
+import 'package:http/http.dart' as http;
 
+import '../Main/BiometricCheck.dart';
 import '../Welcome/WelcomeLayout.dart';
 import '../SignUp/SignUpLayout.dart';
 import '../Main/MainLayout.dart';
@@ -124,15 +127,65 @@ class _LoginLayoutState extends State<LoginLayout> {
                         child: TextButton(
                             onPressed: () async {
                               // Validate returns true if the form is valid, or false otherwise.
+                              //Burak
+                              //Burada validate() fonksiyonu login infolarını doğru alıp almadığımı sorguluyor.
+                              //Eğer doğru almış ise o verileri sana gönderiyor, veriler decodedResponse[0] gibi array içinde taşınıyor
                               if (formGlobalKey1.currentState!.validate()) {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) {
-                                      return const MainLayout();
-                                    },
-                                  ),
+                                //Burada url kısmına django çalışınca terminalde yazan url gelecek
+                                //Ben uygulama çalışsın diye comment attım bilerek
+
+                                final url = '';
+
+                                final response = await http.post(
+                                    Uri.parse(url),
+                                  headers: <String, String>{
+                                    'Content-Type':
+                                    'application/json; charset=UTF-8',
+                                  },
+                                    body: json.encode(
+                                        {"email": emailController.text,
+                                        "password": passwordController.text},
+                                    ),
                                 );
+                                //Eğer gönderim işlemi başarılı ise success code olarak 200 alıyoruz, diğer sayfaya geçebiliriz
+                                if(response.statusCode == 200){
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) {
+                                        return LocationCheck(userEmail: emailController.text);
+                                      },
+                                    ),
+                                  );
+                                }
+                                //Eğer validation başarısızsa(şu an URI içinde url yok o yüzden ERROR alıyoruz)
+                                //Bu durumda da hata pop-up'ı verecek kanka şifren hatalı diye
+                                //Ha bizde vermiyor çünkü herhangi bir validation yok, gönderimde patlıyoruz daha
+                                else{
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return Dialog(
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                            BorderRadius.circular(40)),
+                                        elevation: 16,
+                                        child: Container(
+                                          child: ListView(
+                                            shrinkWrap: true,
+                                            children: <Widget>[
+                                              SizedBox(height: 20),
+                                              Center(
+                                                  child: Text(
+                                                      'Invalid email or password')),
+                                              SizedBox(height: 20),
+                                            ],
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  );
+                                }
                               }
                             },
                             child: const Text("Login",

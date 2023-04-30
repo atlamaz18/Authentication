@@ -1,3 +1,4 @@
+import 'package:authentication/View/Main/LocationCheck.dart';
 import 'package:authentication/View/Main/Settings.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -30,7 +31,6 @@ class MainLayout extends StatelessWidget {
                   fontSize: 30, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: size.height * 0.01),
-            // groceree gives you fresh vegetables and fruits
             Text(
               'Thanks for believing us',
               textAlign: TextAlign.center,
@@ -41,7 +41,7 @@ class MainLayout extends StatelessWidget {
               ),
             ),
 
-            SizedBox(height: size.height * 0.08),
+            SizedBox(height: size.height * 0.01),
 
             TextButton(
                 onPressed: () {
@@ -73,6 +73,38 @@ class MainLayout extends StatelessWidget {
                             fontWeight: FontWeight.normal))
                   ],
                 ),),
+            TextButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) {
+                      //Mail değişecek!
+                      return LocationCheck(userEmail: "atlamaz18@itu.edu.tr",);
+                    },
+                  ),
+                );
+              },
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  SizedBox(
+                    height: size.height * 0.1,
+                    width: size.width * 0.5,
+                    child: const DecoratedBox(
+                        decoration: BoxDecoration(
+                            borderRadius:
+                            BorderRadius.all(Radius.circular(10)),
+                            color: Color(0XFF19586A))),
+                  ),
+                  const Text("Location Checker",
+                      style: TextStyle(
+                          fontSize: 16,
+                          color: Color(0XFFF8F8F8),
+                          fontWeight: FontWeight.normal))
+                ],
+              ),),
+
           ],
         ),
       ),

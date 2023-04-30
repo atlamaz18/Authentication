@@ -1,15 +1,15 @@
+import 'package:authentication/View/Main/LocationCheck.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'dart:convert';
+import 'package:http/http.dart' as http;
+
 import '../Login/LoginLayout.dart';
-import '../Main/MainLayout.dart';
 import '../Welcome/WelcomeLayout.dart';
 
 TextEditingController passwordController = TextEditingController();
 TextEditingController emailController = TextEditingController();
-TextEditingController fullNameController = TextEditingController();
-
 
 class SignUpLayout extends StatefulWidget {
   const SignUpLayout({Key? key}) : super(key: key);
@@ -20,6 +20,12 @@ class SignUpLayout extends StatefulWidget {
 
 class _SignUpLayoutState extends State<SignUpLayout> {
   static final formGlobalKey2 = GlobalKey<FormState>();
+  bool obsPasswordAgain = true;
+  void ToggleObsPasswordAgain() {
+    setState(() {
+      obsPasswordAgain = !obsPasswordAgain;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -123,7 +129,7 @@ class _SignUpLayoutState extends State<SignUpLayout> {
                   SizedBox(height: size.height * 0.015),
                   const Align(
                     alignment: Alignment(-0.76, 0),
-                    child: Text("Name",
+                    child: Text("Password Again",
                         textAlign: TextAlign.left,
                         style: TextStyle(
                             fontSize: 15.5,
@@ -136,19 +142,22 @@ class _SignUpLayoutState extends State<SignUpLayout> {
                     height: size.height * 0.1,
                     width: size.width * 0.8,
                     child: TextFormField(
-                      keyboardType: TextInputType.name,
-                      controller: fullNameController,
+                      keyboardType: TextInputType.visiblePassword,
+                      obscureText: obsPasswordAgain,
                       validator: (sValue) {
-                        if (sValue == null || sValue.isEmpty) {
-                          return 'Please enter a meaningful text';
+                        if (sValue != passwordController.text) {
+                          return 'Your passwords are not the same, check please';
                         }
                         return null;
                       },
-                      decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          hintText: "ITU Student"),
+                        decoration: InputDecoration(
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                            hintText: "********",
+                            suffixIcon: IconButton(
+                                onPressed: ToggleObsPasswordAgain,
+                                icon: Icon(obsPasswordAgain
+                                    ? Icons.visibility_off
+                                    : Icons.visibility)))
                     ),
                   ),
                   SizedBox(height: size.height * 0.015),
@@ -170,15 +179,36 @@ class _SignUpLayoutState extends State<SignUpLayout> {
                         child: TextButton(
                             onPressed: () async {
                               // Validate returns true if the form is valid, or false otherwise.
+
+                              //Burak
+                              //Kanka burası login gibi aynı, şifre ve email verisi var, onları alıp db'ye eklemek gerekiyor.
+                              //Aynı zamanda MandatoryLogin = 0 olacak çünkü ilk defa üye girişi yapılıyor daha konum atamadı
+                              //Konum ve zaman konrolü için ayrı bir page açıp orada göndericem o dataları, boşuna tek sayfaya sıkışmasın
+                              //
                               if (formGlobalKey2.currentState!.validate()) {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) {
-                                      return const MainLayout();
-                                    },
+                                //Burada yine url gerekiyor çalışınca terminalde yazan
+                                final url = '';
+
+                                final response = await http.post(
+                                  Uri.parse(url),
+                                  headers: <String, String>{
+                                    'Content-Type':
+                                    'application/json; charset=UTF-8',
+                                  },
+                                  body: json.encode(<String, String>
+                                    {"email": emailController.text,
+                                      "password": passwordController.text},
                                   ),
                                 );
+
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) {
+                                        return LocationCheck(userEmail: emailController.text);
+                                      },
+                                    ),
+                                  );
                               }
                             },
                             child: const Text("Sign Up",

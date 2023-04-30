@@ -1,3 +1,4 @@
+import 'package:authentication/View/Main/MainLayout.dart';
 import 'package:flutter/material.dart';
 import '../SignUp/SignUpLayout.dart';
 import '../Login/LoginLayout.dart';
@@ -102,7 +103,37 @@ class WelcomeLayout extends StatelessWidget {
                               color: Color(0XFFF8F8F8),
                               fontWeight: FontWeight.normal))
                     ],
-                  ))
+                  )),
+              TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) {
+                          return const MainLayout();
+                        },
+                      ),
+                    );
+                  },
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      SizedBox(
+                        height: size.height * 0.075,
+                        width: size.width * 0.8,
+                        child: const DecoratedBox(
+                            decoration: BoxDecoration(
+                                borderRadius:
+                                BorderRadius.all(Radius.circular(10)),
+                                color: Color(0XFF19586A))),
+                      ),
+                      const Text("Directly Main",
+                          style: TextStyle(
+                              fontSize: 20,
+                              color: Color(0XFFF8F8F8),
+                              fontWeight: FontWeight.normal))
+                    ],
+                  )),
             ])
           ])),
     );
