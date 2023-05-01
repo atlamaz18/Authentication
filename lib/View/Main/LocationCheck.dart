@@ -47,7 +47,7 @@ class _LocationLayoutState extends State<LocationLayout> {
   late double preLong;
   late String preDate;
   late double population;
-  late bool possible;
+  bool possible = true; //DEĞİŞECEK, şimdilik newpage olsun diye true atandı ama late bool olacak
   DateTime date = DateTime.now();
   bool locationBool = false;
 
@@ -198,7 +198,16 @@ class _LocationLayoutState extends State<LocationLayout> {
               TextButton(
                   onPressed: () {
                     //Doğrulama yaptıysa biometric doğrulama kısmına atıyor
-                    if (locationBool && possible) {
+                    if (!locationBool){
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text('Location Authentication Error', textAlign: TextAlign.center,),
+                          content: const Text('You can login after location check and authentication is done. Use the button in the above.', textAlign: TextAlign.center,),
+                      ),);
+                    }
+
+                    else if (locationBool && possible) {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -212,15 +221,8 @@ class _LocationLayoutState extends State<LocationLayout> {
                       );
                     }
                     //Doğrulama yapmadıysa doğrulama yapması için pop-up çıkarıyor.
-                    else if (!locationBool){
-                      showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          title: const Text('Location Authentication Error', textAlign: TextAlign.center,),
-                          content: const Text('You can login after location check and authentication is done. Use the button in the above.', textAlign: TextAlign.center,),
-                        ),);
-                    }
-                    else{
+
+                    else {
                       showDialog(
                         context: context,
                         builder: (context) => AlertDialog(
