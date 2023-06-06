@@ -7,8 +7,35 @@ import 'package:local_auth/local_auth.dart';
 
 
 class MainLayout extends StatelessWidget {
-  const MainLayout({super.key});
+  MainLayout(
+      {super.key,
+      required this.userEmail});
 
+  static const String _title = 'Flutter Code Sample';
+
+  final String userEmail;
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: _title,
+      home: MainPage(
+          userEmail: userEmail),
+    );
+  }
+
+
+}
+
+class MainPage extends StatefulWidget {
+  const MainPage({super.key, required this.userEmail});
+
+  final String userEmail;
+
+  @override
+  State<MainPage> createState() => _MainPageState();
+}
+
+class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -44,35 +71,35 @@ class MainLayout extends StatelessWidget {
             SizedBox(height: size.height * 0.01),
 
             TextButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) {
-                        return const Settings();
-                      },
-                    ),
-                  );
-                },
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    SizedBox(
-                      height: size.height * 0.1,
-                      width: size.width * 0.5,
-                      child: const DecoratedBox(
-                          decoration: BoxDecoration(
-                              borderRadius:
-                              BorderRadius.all(Radius.circular(10)),
-                              color: Color(0XFF19586A))),
-                    ),
-                    const Text("Personal Data Settings",
-                        style: TextStyle(
-                            fontSize: 16,
-                            color: Color(0XFFF8F8F8),
-                            fontWeight: FontWeight.normal))
-                  ],
-                ),),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) {
+                      return Settings(userEmail: widget.userEmail,);
+                    },
+                  ),
+                );
+              },
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  SizedBox(
+                    height: size.height * 0.1,
+                    width: size.width * 0.5,
+                    child: const DecoratedBox(
+                        decoration: BoxDecoration(
+                            borderRadius:
+                            BorderRadius.all(Radius.circular(10)),
+                            color: Color(0XFF19586A))),
+                  ),
+                  const Text("Personal Data Settings",
+                      style: TextStyle(
+                          fontSize: 16,
+                          color: Color(0XFFF8F8F8),
+                          fontWeight: FontWeight.normal))
+                ],
+              ),),
             TextButton(
               onPressed: () {
                 Navigator.push(
@@ -111,3 +138,4 @@ class MainLayout extends StatelessWidget {
     );
   }
 }
+

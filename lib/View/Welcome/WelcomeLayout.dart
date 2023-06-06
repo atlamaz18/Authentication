@@ -110,7 +110,7 @@ class WelcomeLayout extends StatelessWidget {
                       context,
                       MaterialPageRoute(
                         builder: (context) {
-                          return const MainLayout();
+                          return MainLayout(userEmail: "userEmail");
                         },
                       ),
                     );

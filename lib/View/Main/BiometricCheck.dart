@@ -83,19 +83,28 @@ class _BiometricLayoutState extends State<BiometricLayout> {
             children: <Widget>[
               SizedBox(height: size.height * 0.1),
               if(_supportState)
-                const Text('This device is supported for biometric authentication.')
+                const Text('This device is supported for biometric authentication.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 22),)
               else
-                const Text('This device is not supported for biometric authentication.'),
-              SizedBox(height: size.height * 0.05),
+                const Text('This device is not supported for biometric authentication.',
+                  textAlign: TextAlign.center,style:
+                  TextStyle(fontSize: 22),
+                ),
+              SizedBox(height: size.height * 0.06),
               Padding(
                padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 45.0),
-                child: Text('The population per meter square is ${widget.population / 9}. ${populationString} to use face scan.', textAlign: TextAlign.center,),
+                child: Text('The population per meter square \n ${widget.population / 9}\n${populationString} to use face scan.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 22,
+                  ),),
               ),
 
               //Aşağıdaki commentler hangi biometric türeri available onu gösteriyor
               //Bizim cihazda ikisi de var np, o yüzden bu butonu kaldırdım
               //ElevatedButton(onPressed: _getAvailableBiometrics, child: const Text('Get Available Biometrics')),
-              SizedBox(height: size.height * 0.5),
+              SizedBox(height: size.height * 0.46),
               ElevatedButton(onPressed: _authenticate,
                 child: Text('Authenticate'),
                 style: ElevatedButton.styleFrom(
@@ -113,7 +122,7 @@ class _BiometricLayoutState extends State<BiometricLayout> {
   Future<void> _authenticate() async {
     try{
       bool authenticated = await auth.authenticate(
-        localizedReason: 'Biometrik doğrulama yap seri',
+        localizedReason: 'Biometric authentication for graduation project',
         options: const AuthenticationOptions(
           stickyAuth: true,
           biometricOnly: true,
@@ -124,7 +133,7 @@ class _BiometricLayoutState extends State<BiometricLayout> {
         context,
         MaterialPageRoute(
           builder: (context) {
-            return MainLayout();
+            return MainLayout(userEmail: widget.userEmail);
           },
         ),
       );

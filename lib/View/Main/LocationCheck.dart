@@ -40,7 +40,7 @@ class LocationLayout extends StatefulWidget {
 }
 
 class _LocationLayoutState extends State<LocationLayout> {
-  String locationMessage = "Current Location";
+  String locationMessage = 'Make Location Authentication';
   late double lat;
   late double preLat;
   late double long;
@@ -83,8 +83,8 @@ class _LocationLayoutState extends State<LocationLayout> {
     );
 
     Geolocator.getPositionStream(locationSettings: locationSettings).listen((Position position) {
-      lat = position.latitude.toString();
-      long = position.longitude.toString();
+      lat = position.latitude; //.toString()
+      long = position.longitude; //.toString()
       date = DateTime.now();
       setState(() {
         locationMessage = 'Latitude: $lat\n Longitude: $long\n Date: $date';
@@ -126,11 +126,11 @@ class _LocationLayoutState extends State<LocationLayout> {
               Text(locationMessage,
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 12,
+                  fontSize: 23,
                   color: Colors.grey[700],
                   fontWeight: FontWeight.w400,
                 ),),
-              SizedBox(height: size.height * 0.15),
+              SizedBox(height: size.height * 0.08),
               //Burak
               //Burası biraz karıştı, normalde onPressed fonksiyonunu async yapıyorduk cevap beklediği için
               //Ama bu sefer içinde bir fonksiyon daha var, o yüzden içindeki fonksiyonu async yapmak zorundayız
@@ -140,7 +140,7 @@ class _LocationLayoutState extends State<LocationLayout> {
                   locationBool = true; //Burada konum doğrulama yapmadan biometric'e geçmesini önledim
                   lat = value.latitude;
                   long = value.longitude;
-                  String dateTime = DateFormat('yyyy-MM-dd – kk:mm').format(date);
+                  String dateTime = DateFormat('yyyy-MM-dd – hh:mm:ss').format(date);
 
                   final url = '';
 
@@ -194,7 +194,7 @@ class _LocationLayoutState extends State<LocationLayout> {
                       color: Color(0XFFF8F8F8),
                       fontWeight: FontWeight.normal),),
               ),
-              SizedBox(height: size.height * 0.02),
+              SizedBox(height: size.height * 0.01),
               TextButton(
                   onPressed: () {
                     //Doğrulama yaptıysa biometric doğrulama kısmına atıyor
@@ -233,7 +233,7 @@ class _LocationLayoutState extends State<LocationLayout> {
                         context,
                         MaterialPageRoute(
                           builder: (context) {
-                            return MainLayout();},
+                            return MainLayout(userEmail: widget.userEmail);},
                         ),
                       );
                     }

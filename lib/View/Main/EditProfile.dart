@@ -37,7 +37,7 @@ class _EditProfileState extends State<EditProfile> {
                             context,
                             MaterialPageRoute(
                               builder: (context) {
-                                return const Settings();
+                                return Settings(userEmail: "widget.userEmail");
                               },
                             ),
                           );
