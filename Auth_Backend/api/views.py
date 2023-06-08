@@ -16,9 +16,9 @@ def create_user(request):
         password = data['password']
         User = get_user_model()
         user = User.objects.create(email=email, password=make_password(password))
-        return JsonResponse({'status': 'success'})
+        return JsonResponse({'status': 'success'}, status=200)
     else:
-        return JsonResponse({'status': 'not a post request'})
+        return JsonResponse({'status': 'not a post request'}, status=400)
 
 @api_view(['POST'])
 def login_view(request):
