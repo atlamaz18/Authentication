@@ -187,7 +187,8 @@ class _SignUpLayoutState extends State<SignUpLayout> {
                               //
                               if (formGlobalKey2.currentState!.validate()) {
                                 //Burada yine url gerekiyor çalışınca terminalde yazan
-                                final url = '';
+                        
+                                final url = 'http://10.0.2.2:8000/create_user';
 
                                 final response = await http.post(
                                   Uri.parse(url),
