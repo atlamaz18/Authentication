@@ -3,7 +3,8 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 
 # Create your models here.
 
-class User(models.Model):
-    email = models.EmailField()
+class User(AbstractBaseUser):
+    email = models.EmailField(unique=True)
     password = models.TextField()
+    USERNAME_FIELD = 'email'
     
