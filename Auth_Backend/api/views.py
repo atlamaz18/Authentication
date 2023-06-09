@@ -4,9 +4,12 @@ from rest_framework.views import APIView
 from django.contrib.auth.hashers import make_password, check_password
 from django.contrib.auth import get_user_model
 from django.contrib.auth import authenticate, login
-
+from django.core.exceptions import ObjectDoesNotExist
 from django.http import JsonResponse
 import json
+from datetime import datetime
+from .models import User, UserLocation
+from .helpers import coordinateToString
 
 @api_view(['POST'])
 def create_user(request):
@@ -38,3 +41,27 @@ def login_view(request):
             return JsonResponse({'status': 'error', 'message': 'Invalid credentials3'}, status=400)
     else:
         return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=400)
+
+@api_view(['POST'])
+def location_check_view(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body.decode('utf-8'))
+            user = User.objects.get(email=data['email'])
+            latitude = float(data['latitude'])
+            longitude = float(data['longitude'])
+            date = datetime.strptime(data['date'], '%Y-%m-%dT%H:%M:%S.%f')  # Adjust format if necessary
+            user.add_location(latitude, longitude)
+            location = user.locations.latest('date')
+            location.date = date
+            location.save()
+            location_info = coordinateToString([latitude, longitude])
+            return JsonResponse(location_info, status=200)
+        except KeyError:
+            return JsonResponse({'error': 'Bad request Key'}, status=400)
+        except ValueError:
+            return JsonResponse({'error': 'Bad request Value'}, status=400)
+        except ObjectDoesNotExist:
+            return JsonResponse({'error': 'User not found'}, status=404)
+    else:
+        return JsonResponse({'error': 'Invalid Method'}, status=405)
