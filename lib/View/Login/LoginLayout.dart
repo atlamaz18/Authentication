@@ -1,15 +1,12 @@
 import 'package:authentication/View/Main/LocationCheck.dart';
-import 'package:authentication/View/Main/MainLayout.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-import '../Main/BiometricCheck.dart';
 import '../Welcome/WelcomeLayout.dart';
 import '../SignUp/SignUpLayout.dart';
-import '../Main/MainLayout.dart';
 
 
 
@@ -176,8 +173,8 @@ class _LoginLayoutState extends State<LoginLayout> {
                                             children: <Widget>[
                                               SizedBox(height: 20),
                                               Center(
-                                                  child: Text(
-                                                      'Invalid email or password')),
+                                                  child: Text(response.body),
+                                              ),
                                               SizedBox(height: 20),
                                             ],
                                           ),
