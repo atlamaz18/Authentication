@@ -1,9 +1,7 @@
 import 'package:authentication/View/Main/EditProfile.dart';
 import 'package:authentication/View/Main/MainLayout.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:settings_ui/settings_ui.dart';
-import 'package:local_auth/local_auth.dart';
 
 import 'package:http/http.dart' as http;
 import "dart:convert";
@@ -39,7 +37,6 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
     bool _fingerprint = false;
     bool _facescan = false;
 
@@ -129,7 +126,26 @@ class _SettingsPageState extends State<SettingsPage> {
               SettingsTile.navigation(
                 leading: const Icon(Icons.note_alt_sharp),
                 title: const Text('If you add specific number of mandatory locations, the app cannot be opened in another locations'),
-
+              ),
+            ],
+          ),
+          SettingsSection(
+            title: const Text('Face Recognition'),
+            tiles: <SettingsTile>[
+              SettingsTile.navigation(
+                leading: const Icon(Icons.edit),
+                title: const Text('Edit Profile'),
+                value: const Text('Change your password etc'),
+                onPressed: (BuildContext context) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) {
+                        return EditProfile();
+                      },
+                    ),
+                  );
+                },
               ),
             ],
           ),

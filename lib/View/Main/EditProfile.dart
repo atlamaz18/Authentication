@@ -1,8 +1,15 @@
 import 'package:authentication/View/Main/Settings.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:local_auth/local_auth.dart';
+
 
 TextEditingController passwordController = TextEditingController();
+TextEditingController newpasswordController = TextEditingController();
 TextEditingController emailController = TextEditingController();
+TextEditingController newemailController = TextEditingController();
 TextEditingController fullNameController = TextEditingController();
 
 class EditProfile extends StatefulWidget {
@@ -14,6 +21,7 @@ class EditProfile extends StatefulWidget {
 
 class _EditProfileState extends State<EditProfile> {
   static final formGlobalKey3 = GlobalKey<FormState>();
+  final LocalAuthentication auth = LocalAuthentication();
 
   @override
   Widget build(BuildContext context) {
@@ -60,7 +68,7 @@ class _EditProfileState extends State<EditProfile> {
                       children: <TextSpan>[
                         TextSpan(text: 'Personalize\n'),
                         TextSpan(
-                          text: 'Write to the blank that you want to change',
+                          text: 'Write the blank that you want to change',
                           style: TextStyle(color: Color(0XFF19586A),
                               fontSize: 15,
                               fontWeight: FontWeight.w400),)
@@ -70,7 +78,7 @@ class _EditProfileState extends State<EditProfile> {
                   SizedBox(height: size.height * 0.060),
                   const Align(
                     alignment: Alignment(-0.76, 0),
-                    child: Text("E-mail",
+                    child: Text("Previous E-mail",
                         textAlign: TextAlign.left,
                         style: TextStyle(
                             fontSize: 15.5,
@@ -101,7 +109,38 @@ class _EditProfileState extends State<EditProfile> {
                   SizedBox(height: size.height * 0.015),
                   const Align(
                     alignment: Alignment(-0.76, 0),
-                    child: Text("Password",
+                    child: Text("New E-mail",
+                        textAlign: TextAlign.left,
+                        style: TextStyle(
+                            fontSize: 15.5,
+                            fontFamily: 'Poppins',
+                            color: Color.fromRGBO(25, 88, 106, 1),
+                            fontWeight: FontWeight.bold)),
+                  ),
+                  SizedBox(height: size.height * 0.015),
+                  SizedBox(
+                    height: size.height * 0.1,
+                    width: size.width * 0.8,
+                    child: TextFormField(
+                      controller: newemailController,
+                      keyboardType: TextInputType.emailAddress,
+                      validator: (sValue) {
+                        if (sValue == null || sValue.isEmpty) {
+                          return 'Please enter a meaningful text';
+                        }
+                        return null;
+                      },
+                      decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          hintText: "abc@itu.edu.tr"),
+                    ),
+                  ),
+                  SizedBox(height: size.height * 0.015),
+                  const Align(
+                    alignment: Alignment(-0.76, 0),
+                    child: Text("Previous Password",
                         textAlign: TextAlign.left,
                         style: TextStyle(
                             fontSize: 15.5,
@@ -117,35 +156,20 @@ class _EditProfileState extends State<EditProfile> {
                   SizedBox(height: size.height * 0.015),
                   const Align(
                     alignment: Alignment(-0.76, 0),
-                    child: Text("Name",
+                    child: Text("New Password",
                         textAlign: TextAlign.left,
                         style: TextStyle(
                             fontSize: 15.5,
-                            fontFamily: 'Poppins',
                             color: Color.fromRGBO(25, 88, 106, 1),
+                            fontFamily: 'Poppins',
                             fontWeight: FontWeight.bold)),
                   ),
                   SizedBox(height: size.height * 0.015),
                   SizedBox(
-                    height: size.height * 0.1,
-                    width: size.width * 0.8,
-                    child: TextFormField(
-                      keyboardType: TextInputType.name,
-                      controller: fullNameController,
-                      validator: (sValue) {
-                        if (sValue == null || sValue.isEmpty) {
-                          return 'Please enter a meaningful text';
-                        }
-                        return null;
-                      },
-                      decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          hintText: "ITU Student"),
-                    ),
-                  ),
-                  SizedBox(height: size.height * 0.025),
+                      height: size.height * 0.1,
+                      width: size.width * 0.8,
+                      child: const NewPasswordField()),
+                  SizedBox(height: size.height * 0.04),
                   Stack(
                     alignment: Alignment.center,
                     children: [
@@ -163,16 +187,9 @@ class _EditProfileState extends State<EditProfile> {
                         width: size.width * 0.8,
                         child: TextButton(
                             onPressed: () async {
-                              // Validate returns true if the form is valid, or false otherwise.
-                              if (formGlobalKey3.currentState!.validate()) {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) {
-                                      return const EditProfile();
-                                    },
-                                  ),
-                                );
+                              bool isBiometric = await _authenticate();
+                              if(isBiometric){
+                                await _form();
                               }
                             },
                             child: const Text("Edit Personal Data",
@@ -191,6 +208,62 @@ class _EditProfileState extends State<EditProfile> {
         ),
       ),
     );
+
+
+  }
+
+  Future<void> _form() async {
+    if (formGlobalKey3.currentState!.validate()) {
+      final url = 'http://161.9.95.174/create_user/';
+      final response = await http.post(
+        Uri.parse(url),
+        headers: <String, String>{
+          'Content-Type':
+          'application/json; charset=UTF-8',
+        },
+        body: json.encode(<String, String>
+        {"email": emailController.text,
+          "password": passwordController.text,
+          "newemail": newemailController.text,
+          "newpassword": newpasswordController.text},
+        ),
+      );
+      if(response.statusCode == 200){
+        print("tamam status doru");
+      }
+      else{
+        print("status aslında şu");
+        print(response.statusCode);
+      }
+    }
+  }
+
+  Future<bool> _authenticate() async {
+    try{
+      bool authenticated = await auth.authenticate(
+        localizedReason: 'Biometric authentication for graduation project',
+        options: const AuthenticationOptions(
+          stickyAuth: true,
+          biometricOnly: true,
+        ),
+      );
+      print("Authenticated: $authenticated");
+      return Future.value(true);
+      // Validate returns true if the form is valid, or false otherwise.
+
+        /*Navigator.push(
+            context,
+            MaterialPageRoute(
+               builder: (context) {
+                  return const EditProfile();
+               },
+             ),
+           );*/
+
+    } on PlatformException catch (e) {
+      print(e);
+      return Future.value(false);
+    }
   }
 }
 
@@ -214,6 +287,47 @@ class _PasswordFieldState extends State<PasswordField> {
   Widget build(BuildContext context) {
     return TextFormField(
         controller: passwordController,
+        keyboardType: TextInputType.visiblePassword,
+        obscureText: obsecurePassword,
+        //validator: (val) => (val!.length< 8 || val.isEmpty) ? 'Please enter a meaningful text' : null,
+        validator: (sValue) {
+          if (sValue == null || sValue.isEmpty) {
+            return 'Please enter a meaningful text';
+          } else if (sValue.length < 2) {
+            return 'Password is shorter than 8 characters.';
+          }
+          return null;
+        },
+        decoration: InputDecoration(
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+            hintText: "********",
+            suffixIcon: IconButton(
+                onPressed: ToggleObsecure,
+                icon: Icon(obsecurePassword
+                    ? Icons.visibility_off
+                    : Icons.visibility))));
+  }
+}
+
+class NewPasswordField extends StatefulWidget {
+  const NewPasswordField({Key? key}) : super(key: key);
+
+  @override
+  State<NewPasswordField> createState() => _NewPasswordFieldState();
+}
+
+class _NewPasswordFieldState extends State<NewPasswordField> {
+  bool obsecurePassword = true;
+  void ToggleObsecure() {
+    setState(() {
+      obsecurePassword = !obsecurePassword;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+        controller: newpasswordController,
         keyboardType: TextInputType.visiblePassword,
         obscureText: obsecurePassword,
         //validator: (val) => (val!.length< 8 || val.isEmpty) ? 'Please enter a meaningful text' : null,
