@@ -1,5 +1,6 @@
 import 'package:authentication/View/Main/EditProfile.dart';
 import 'package:authentication/View/Main/MainLayout.dart';
+import 'package:authentication/View/Main/EditMandatory.dart';
 import 'package:flutter/material.dart';
 import 'package:settings_ui/settings_ui.dart';
 
@@ -108,6 +109,21 @@ class _SettingsPageState extends State<SettingsPage> {
           SettingsSection(
             title: const Text('User-defined Location'),
             tiles: <SettingsTile>[
+              SettingsTile.navigation(
+                leading: const Icon(Icons.face_retouching_natural),
+                title: const Text('Edit Mandatory Loc'),
+                value: const Text('Add or Delete both'),
+                onPressed: (BuildContext context) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) {
+                        return EditMandatory(userEmail: 'userEmail');
+                      },
+                    ),
+                  );
+                },
+              ),
               SettingsTile.navigation(
                 leading: const Icon(Icons.person_outline),
                 title: const Text('Add Mandatory Data'),

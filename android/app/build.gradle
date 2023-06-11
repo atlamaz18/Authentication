@@ -51,6 +51,8 @@ android {
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
+        //Maps yüzünden bu eklendi
+        minSdkVersion 20
     }
 
     buildTypes {
