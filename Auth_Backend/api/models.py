@@ -8,8 +8,8 @@ class User(AbstractBaseUser):
     password = models.TextField()
     USERNAME_FIELD = 'email'
     # Use this function to add newest location.
-    def add_location(self, latitude, longitude):
-        UserLocation.objects.create(user=self, latitude=latitude, longitude=longitude)
+    def add_location(self, latitude, longitude, date):
+        UserLocation.objects.create(user=self, latitude=latitude, longitude=longitude, date=date)
         locations = self.locations.all()
         if len(locations) > 5:
             oldest_location = locations.order_by('date').first()

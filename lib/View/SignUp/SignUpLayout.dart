@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import '../Login/LoginLayout.dart';
 import '../Welcome/WelcomeLayout.dart';
@@ -187,9 +188,9 @@ class _SignUpLayoutState extends State<SignUpLayout> {
                               //
                               if (formGlobalKey2.currentState!.validate()) {
                                 //Burada yine url gerekiyor çalışınca terminalde yazan
-                        
-                                final url = 'http://10.0.2.2:8000/create_user/';
-
+                                final baseUrl = dotenv.env['BASE_URL'];
+                                final url = (baseUrl != null ? baseUrl : 'http://127.0.0.1') + '/create_user/';
+                                print(url);
                                 final response = await http.post(
                                   Uri.parse(url),
                                   headers: <String, String>{

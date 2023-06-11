@@ -10,6 +10,7 @@ import '../Welcome/WelcomeLayout.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';  //DateTime düzenlemek için
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class LocationCheck extends StatelessWidget {
   LocationCheck(
@@ -141,8 +142,8 @@ class _LocationLayoutState extends State<LocationLayout> {
                   lat = value.latitude;
                   long = value.longitude;
                   String dateTime = DateFormat('yyyy-MM-dd – hh:mm:ss').format(date);
-
-                  final url = '';
+                  final baseUrl = dotenv.env['BASE_URL'];
+                  final url = (baseUrl != null ? baseUrl : 'http://127.0.0.1') + '/location_check/';
 
                   final response = await http.post(
                     Uri.parse(url),
@@ -164,19 +165,23 @@ class _LocationLayoutState extends State<LocationLayout> {
                   //await bitti, response değerini aldık, işleme koyabilirim
 
                   final decodedResponse = jsonDecode(response.body);
-                  print(decodedResponse[0]); //Doğru elementler geldi mi kontrol ediyorum print ile
+                  print(decodedResponse); //Doğru elementler geldi mi kontrol ediyorum print ile
 
                   //Burada hangi değerlerin döndüğü yazıyor
                   //Bu değerler döndükten sonra gerisini flutterda hallettim ben
-                  preDate = decodedResponse[0]["previousDate"];
-                  preLat = decodedResponse[0]["previousLatitude"];
-                  preLong = decodedResponse[0]["previousLongitude"];
-                  population = decodedResponse[0]["population"];
-                  possible = decodedResponse[0]["possible"];
+                  String pre_Date = decodedResponse["previousDate"];
+                  String pre_loc = decodedResponse["pre_loc"];
+                  String cur_loc = decodedResponse["cur_loc"];
+
+                  //preLat = decodedResponse[0]["previousLatitude"];
+                  //preLong = decodedResponse[0]["previousLongitude"];
+
+                  //population = decodedResponse[0]["population"];
+                  //possible = decodedResponse[0]["possible"];
 
                   setState(() {
-                    locationMessage = 'Current Location: Latitude: $lat  Longitude: $long Date: $date\n';
-                    locationMessage += 'Last Location: Latitude: $preLat  Longitude: $preLong Date: $preDate';
+                    locationMessage = 'Current Location: $cur_loc Date: $date\n';
+                    locationMessage += 'Last Location: $pre_loc Date: $pre_Date';
 
                     //Canlı konum takibi yaptırabilirim, ama kapatıyorum bizim uygulamada şimdilik unnecessary
                     //_liveLocation();

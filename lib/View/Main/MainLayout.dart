@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../Welcome/WelcomeLayout.dart';
 import 'package:local_auth/local_auth.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 
 class MainLayout extends StatelessWidget {

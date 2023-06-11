@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:local_auth/local_auth.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 
 TextEditingController passwordController = TextEditingController();
@@ -214,7 +215,9 @@ class _EditProfileState extends State<EditProfile> {
 
   Future<void> _form() async {
     if (formGlobalKey3.currentState!.validate()) {
-      final url = 'http://161.9.95.174/create_user/';
+      final baseUrl = dotenv.env['BASE_URL'];
+      final url = (baseUrl != null ? baseUrl : 'http://127.0.0.1') + '/change_settings/';
+
       final response = await http.post(
         Uri.parse(url),
         headers: <String, String>{

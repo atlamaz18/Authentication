@@ -2,6 +2,7 @@ import 'package:authentication/View/Main/LocationCheck.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
@@ -131,7 +132,8 @@ class _LoginLayoutState extends State<LoginLayout> {
                                 //Burada url kısmına django çalışınca terminalde yazan url gelecek
                                 //Ben uygulama çalışsın diye comment attım bilerek
 
-                                final url = '';
+                                final baseUrl = dotenv.env['BASE_URL'];
+                                final url = (baseUrl != null ? baseUrl : 'http://127.0.0.1') + '/login/';
 
                                 final response = await http.post(
                                     Uri.parse(url),

@@ -8,12 +8,10 @@ def coordinateToString(coord):
     geolocator = Nominatim(user_agent="auth_app")
     location = geolocator.reverse(loc)
     raw_data = location.raw['address']
-    data = {}
-    print(raw_data)
+    data = ""
     if 'town' in raw_data:
-        data['town'] = raw_data['town']
-    data['province'] = raw_data['province']
-    data['country'] = raw_data['country']
+        data = data + raw_data['town'] + ","
+    data = data + raw_data['province'] + "," + raw_data['country']
     return data
 
 # Returns distance between two coordinates in kilometers
