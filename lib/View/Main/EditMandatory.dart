@@ -74,21 +74,21 @@ class _EditMandatoryState extends State<EditMandatory> {
   }
 
   void _addMarkers(List<dynamic> locations) {
-    for (var location in locations) {
+    for (int i = 0; i < locations.length; i++) {
+      var location = locations[i];
       final LatLng latLng = LatLng(location['latitude'], location['longitude']);
       final marker = Marker(
-        markerId: MarkerId(location['id'].toString()),
+        markerId: MarkerId('Marker_$i'),
         position: latLng,
         infoWindow: InfoWindow(
-          title: 'Location ${location['id']}',
+          title: 'Location ${i+1}',  // you can replace this with `Location ${location['id']}` if your location objects have 'id' property
         ),
       );
       _markers.add(marker);
       _dynamicMarkers.add(marker);
-
     }
-    setState(() {});
-  }
+    setState(() {});  // This will cause the map to rebuild and show the newly added markers
+}
 
   void _deleteSelectedMarker() {
     if (_selectedLocation != null) {
@@ -100,36 +100,37 @@ class _EditMandatoryState extends State<EditMandatory> {
   }
 
   Future<void> _addLocation() async {
-    if (_selectedLocation != null) {
-      final latitude = _selectedLocation!.latitude;
-      final longitude = _selectedLocation!.longitude;
-      final baseUrl = dotenv.env['BASE_URL'];
-      final finalurl = (baseUrl != null ? baseUrl : 'http://127.0.0.1') + '/add_mandatory_location/';
-      final response = await http.post(
-        Uri.parse(finalurl),
-        body: jsonEncode({
-          'email': widget.userEmail,
-          'latitude': latitude,
-          'longitude': longitude,
-        }),
-      );
+  if (_selectedLocation != null) {
+    final latitude = _selectedLocation!.latitude;
+    final longitude = _selectedLocation!.longitude;
+    final baseUrl = dotenv.env['BASE_URL'];
+    final finalurl = (baseUrl != null ? baseUrl : 'http://127.0.0.1') + '/add_mandatory_location/';
+    final response = await http.post(
+      Uri.parse(finalurl),
+      body: jsonEncode({
+        'email': widget.userEmail,
+        'latitude': latitude,
+        'longitude': longitude,
+      }),
+    );
 
-      if (response.statusCode == 200) {
-        final marker = Marker(
-          markerId: MarkerId('new_location'),
-          position: _selectedLocation!,
-          infoWindow: InfoWindow(
-            title: 'New Location',
-          ),
-        );
-        _markers = _markers.union(Set<Marker>.from([..._dynamicMarkers, marker]));
-        _dynamicMarkers.add(marker);
-        setState(() {});
-      } else {
-        print('Failed to add location. Status code: ${response.statusCode}');
-      }
+    if (response.statusCode == 200) {
+      final markerId = MarkerId('new_location_${_dynamicMarkers.length + 1}');
+      final marker = Marker(
+        markerId: markerId,
+        position: _selectedLocation!,
+        infoWindow: InfoWindow(
+          title: 'New Location',
+        ),
+      );
+      _markers.add(marker);
+      _dynamicMarkers.add(marker);
+      setState(() {});
+    } else {
+      print('Failed to add location. Status code: ${response.statusCode}');
     }
   }
+}
 
   @override
   Widget build(BuildContext context) {
