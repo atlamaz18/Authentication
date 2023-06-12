@@ -118,6 +118,20 @@ class _EditMandatoryState extends State<EditMandatory> {
         print('Failed to delete location. Status code: ${response.statusCode}');
       }
     }
+    // Code to handle deletion of locations retrieved from the database
+    //ANIL bu kod line'ı ekledim gece deneriz
+    Marker? deletedLocation;
+    for (var marker in _dynamicMarkers) {
+      if (marker.position == _selectedLocation) {
+        deletedLocation = marker;
+        break;
+      }
+    }
+    if (deletedLocation != null) {
+      _dynamicMarkers.remove(deletedLocation);
+      setState(() {});
+    }
+    //Burada bitiyor ekleme
   }
 
   Future<void> _addLocation() async {

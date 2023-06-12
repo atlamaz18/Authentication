@@ -1,8 +1,8 @@
 import 'dart:convert';
-
 import 'package:authentication/View/Main/BiometricCheck.dart';
 import 'package:authentication/View/Main/MainLayout.dart';
 import 'package:authentication/View/Main/Settings.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -48,9 +48,17 @@ class _LocationLayoutState extends State<LocationLayout> {
   late double preLong;
   late String preDate;
   late double population;
-  bool possible = true; //DEĞİŞECEK, şimdilik newpage olsun diye true atandı ama late bool olacak
+  bool possible = true;      //ANIL, possible backendten olumlu veya olumsuz bir sonuç dönmesine göre kontrol ediyor
   DateTime date = DateTime.now();
   bool locationBool = false;
+
+  Future<bool> _checkVPNStatus() async {
+    final connectivityResult = await Connectivity().checkConnectivity();
+    if (connectivityResult == ConnectivityResult.vpn) {
+      return true; // VPN is enabled
+    }
+    return false; // VPN is not enabled
+  }
 
   Future<Position> _getCurrentLocation() async{
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
@@ -138,7 +146,7 @@ class _LocationLayoutState extends State<LocationLayout> {
               //onPressed fonksiyonunu async yapmadım 2 defa tepki vermesi gerekmesin diye, orayı değiştirebiliriz belki
               ElevatedButton(onPressed: () {
                 _getCurrentLocation().then((value) async {
-                  locationBool = true; //Burada konum doğrulama yapmadan biometric'e geçmesini önledim
+                  locationBool = true;  //Konuma tıklamadan direkt biometric'e geçmesini önledim.
                   lat = value.latitude;
                   long = value.longitude;
                   String dateTime = DateFormat('yyyy-MM-dd – hh:mm:ss').format(date);
@@ -157,7 +165,7 @@ class _LocationLayoutState extends State<LocationLayout> {
                         {"latitude": lat,
                           "longitude": long,
                           "date": dateTime,
-                          "email": widget.userEmail, //Bu böyle gönderiliyor diye biliyorum, değiştir
+                          "email": widget.userEmail, //Bu böyle gönderiliyor diye biliyorum
                         }
                     ),
                   );
@@ -177,6 +185,8 @@ class _LocationLayoutState extends State<LocationLayout> {
                   //preLong = decodedResponse[0]["previousLongitude"];
 
                   //population = decodedResponse[0]["population"];
+
+                  //ANIL, burada backendten eğer konum doğrulama geçildiyse true, geçilmediyse false gönermen lazım, aşağıda nedenini anlattım
                   //possible = decodedResponse[0]["possible"];
 
                   setState(() {
@@ -212,6 +222,7 @@ class _LocationLayoutState extends State<LocationLayout> {
                       ),);
                     }
 
+                    //ANIL, eğer konum doğrulama geçtiyse ikisi de true olacak ve biometrice geçecek, possible false olursa diğer sayfaya geçmesini engelledim.
                     else if (locationBool && possible) {
                       Navigator.push(
                         context,
@@ -226,7 +237,7 @@ class _LocationLayoutState extends State<LocationLayout> {
                       );
                     }
                     //Doğrulama yapmadıysa doğrulama yapması için pop-up çıkarıyor.
-
+                    //ANIL, bu kısım da possible false ise gireceği yer, o sürede yer değiştirmes imkansız diyor.
                     else {
                       showDialog(
                         context: context,

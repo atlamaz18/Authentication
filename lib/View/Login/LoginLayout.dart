@@ -8,6 +8,7 @@ import 'package:http/http.dart' as http;
 
 import '../Welcome/WelcomeLayout.dart';
 import '../SignUp/SignUpLayout.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 
 
@@ -27,6 +28,14 @@ class _LoginLayoutState extends State<LoginLayout> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
+
+    Future<bool> _checkVPNStatus() async {
+      final connectivityResult = await Connectivity().checkConnectivity();
+      if (connectivityResult == ConnectivityResult.vpn) {
+        return true; // VPN is enabled
+      }
+      return false; // VPN is not enabled
+    }
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
@@ -132,42 +141,16 @@ class _LoginLayoutState extends State<LoginLayout> {
                                 //Burada url kısmına django çalışınca terminalde yazan url gelecek
                                 //Ben uygulama çalışsın diye comment attım bilerek
 
-                                final baseUrl = dotenv.env['BASE_URL'];
-                                final url = (baseUrl != null ? baseUrl : 'http://127.0.0.1') + '/login/';
-
-                                final response = await http.post(
-                                    Uri.parse(url),
-                                  headers: <String, String>{
-                                    'Content-Type':
-                                    'application/json; charset=UTF-8',
-                                  },
-                                    body: json.encode(
-                                        {"email": emailController.text,
-                                        "password": passwordController.text},
-                                    ),
-                                );
-                                //Eğer gönderim işlemi başarılı ise success code olarak 200 alıyoruz, diğer sayfaya geçebiliriz
-                                if(response.statusCode == 200){
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) {
-                                        return LocationCheck(userEmail: emailController.text);
-                                      },
-                                    ),
-                                  );
-                                }
-                                //Eğer validation başarısızsa(şu an URI içinde url yok o yüzden ERROR alıyoruz)
-                                //Bu durumda da hata pop-up'ı verecek kanka şifren hatalı diye
-                                //Ha bizde vermiyor çünkü herhangi bir validation yok, gönderimde patlıyoruz daha
-                                else{
+                                final isVPNEnabled = await _checkVPNStatus();
+                                if (isVPNEnabled) {
                                   showDialog(
                                     context: context,
                                     builder: (context) {
                                       return Dialog(
                                         shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                            BorderRadius.circular(40)),
+                                          borderRadius:
+                                          BorderRadius.circular(5),
+                                        ),
                                         elevation: 16,
                                         child: Container(
                                           child: ListView(
@@ -175,7 +158,9 @@ class _LoginLayoutState extends State<LoginLayout> {
                                             children: <Widget>[
                                               SizedBox(height: 20),
                                               Center(
-                                                  child: Text(response.body),
+                                                child: Text(
+                                                  'VPN is enabled. Please disable the VPN to continue.',
+                                                ),
                                               ),
                                               SizedBox(height: 20),
                                             ],
@@ -184,6 +169,64 @@ class _LoginLayoutState extends State<LoginLayout> {
                                       );
                                     },
                                   );
+                                }
+                                else {
+                                  final baseUrl =
+                                  dotenv.env['BASE_URL'];
+                                  final url = (baseUrl != null
+                                      ? baseUrl
+                                      : 'http://127.0.0.1') +
+                                      '/login/';
+
+                                  final response = await http.post(
+                                    Uri.parse(url),
+                                    headers: <String, String>{
+                                      'Content-Type':
+                                      'application/json; charset=UTF-8',
+                                    },
+                                    body: json.encode({
+                                      "email": emailController.text,
+                                      "password": passwordController.text
+                                    }),
+                                  );
+
+                                  if (response.statusCode == 200) {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) {
+                                          return LocationCheck(
+                                              userEmail:
+                                              emailController.text);
+                                        },
+                                      ),
+                                    );
+                                  } else {
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return Dialog(
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                            BorderRadius.circular(40),
+                                          ),
+                                          elevation: 16,
+                                          child: Container(
+                                            child: ListView(
+                                              shrinkWrap: true,
+                                              children: <Widget>[
+                                                SizedBox(height: 20),
+                                                Center(
+                                                  child: Text(response.body),
+                                                ),
+                                                SizedBox(height: 20),
+                                              ],
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    );
+                                  }
                                 }
                               }
                             },
@@ -262,8 +305,8 @@ class _PasswordFieldState extends State<PasswordField> {
         validator: (sValue) {
           if (sValue == null || sValue.isEmpty) {
             return 'Please enter a meaningful text';
-          } else if (sValue.length < 2) {
-            return 'Password is shorter than 8 characters.';
+          } else if (sValue.length < 4) {
+            return 'Password is shorter than 4 characters.';
           }
           return null;
         },

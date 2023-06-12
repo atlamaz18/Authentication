@@ -288,8 +288,8 @@ class _PasswordFieldState extends State<PasswordField> {
         validator: (sValue) {
           if (sValue == null || sValue.isEmpty) {
             return 'Please enter a meaningful text';
-          } else if (sValue.length < 2) {
-            return 'Password is shorter than 8 characters.';
+          } else if (sValue.length < 4) {
+            return 'Password is shorter than 4 characters.';
           }
           return null;
         },
