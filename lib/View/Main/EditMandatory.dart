@@ -38,6 +38,7 @@ class _EditMandatoryState extends State<EditMandatory> {
   Completer<GoogleMapController> _controller = Completer();
   LatLng? _selectedLocation;
   Set<Marker> _markers = {};
+  List<Marker> _dynamicMarkers = [];
 
   @override
   void initState() {
@@ -80,6 +81,8 @@ class _EditMandatoryState extends State<EditMandatory> {
         ),
       );
       _markers.add(marker);
+      _dynamicMarkers.add(marker);
+
     }
     setState(() {});
   }
@@ -87,8 +90,40 @@ class _EditMandatoryState extends State<EditMandatory> {
   void _deleteSelectedMarker() {
     if (_selectedLocation != null) {
       _markers.removeWhere((marker) => marker.position == _selectedLocation);
+      _dynamicMarkers.removeWhere((marker) => marker.position == _selectedLocation);
       _selectedLocation = null;
       setState(() {});
+    }
+  }
+
+  Future<void> _addLocation() async {
+    if (_selectedLocation != null) {
+      final latitude = _selectedLocation!.latitude;
+      final longitude = _selectedLocation!.longitude;
+
+      final response = await http.post(
+        Uri.parse('Burak'),
+        body: jsonEncode({
+          'email': widget.userEmail,
+          'latitude': latitude,
+          'longitude': longitude,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final marker = Marker(
+          markerId: MarkerId('new_location'),
+          position: _selectedLocation!,
+          infoWindow: InfoWindow(
+            title: 'New Location',
+          ),
+        );
+        _markers.add(marker);
+        _dynamicMarkers.add(marker);
+        setState(() {});
+      } else {
+        print('Failed to add location. Status code: ${response.statusCode}');
+      }
     }
   }
 
@@ -154,11 +189,7 @@ class _EditMandatoryState extends State<EditMandatory> {
                 ),
                 SizedBox(height: size.height * 0.05),
                 ElevatedButton(
-                  onPressed: () {
-                    if (_selectedLocation != null) {
-                      print('Selected Location: ${_selectedLocation!.latitude}, ${_selectedLocation!.longitude}');
-                    }
-                  },
+                  onPressed: _addLocation,
                   child: Text('Add Location'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0XFF19586A),
