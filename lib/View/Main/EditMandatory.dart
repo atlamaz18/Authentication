@@ -90,12 +90,33 @@ class _EditMandatoryState extends State<EditMandatory> {
     setState(() {});  // This will cause the map to rebuild and show the newly added markers
 }
 
-  void _deleteSelectedMarker() {
+  void _deleteSelectedMarker() async {
     if (_selectedLocation != null) {
-      _markers.removeWhere((marker) => marker.position == _selectedLocation);
-      _dynamicMarkers.removeWhere((marker) => marker.position == _selectedLocation);
-      _selectedLocation = null;
-      setState(() {});
+      final latitude = _selectedLocation!.latitude;
+      final longitude = _selectedLocation!.longitude;
+      final baseUrl = dotenv.env['BASE_URL'];
+      final finalurl = (baseUrl != null ? baseUrl : 'http://127.0.0.1') + '/delete_mandatory_location/';
+
+      final response = await http.post(
+        Uri.parse(finalurl),
+        body: jsonEncode({
+          'email': widget.userEmail,
+          'latitude': latitude,
+          'longitude': longitude,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        _markers.removeWhere((marker) => marker.position == _selectedLocation);
+        _dynamicMarkers.removeWhere((marker) => marker.position == _selectedLocation);
+        _selectedLocation = null;
+        setState(() {});
+        setState(() {
+          _dynamicMarkers = _dynamicMarkers.sublist(0, _dynamicMarkers.length - 1);
+        });
+      } else {
+        print('Failed to delete location. Status code: ${response.statusCode}');
+      }
     }
   }
 
@@ -202,6 +223,14 @@ class _EditMandatoryState extends State<EditMandatory> {
                   ),
                 ),
                 SizedBox(height: size.height * 0.01),
+                ElevatedButton(
+                  onPressed: _deleteSelectedMarker, // Call the method to delete the selected marker
+                  child: Text('Delete Location'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0XFF19586A),
+                    minimumSize: Size(size.height * 0.28, size.height * 0.08),
+                  ),
+                ),
               ],
             ),
           ),
