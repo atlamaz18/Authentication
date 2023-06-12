@@ -52,12 +52,20 @@ class _EditMandatoryState extends State<EditMandatory> {
 
   Future<void> _fetchLocations() async {
     // Simulating API call to retrieve location data from the backend
-    final response = await http.get(Uri.parse('ANIL'));
-    if (response.statusCode == 200) {
-      final List<dynamic> locations = jsonDecode(response.body);
-      _addMarkers(locations); // Add markers for each location received from the backend
-    } else {
-      print('Failed to fetch locations. Status code: ${response.statusCode}');
+    final url = Uri.parse('ANIL');
+    final body = jsonEncode({'email': widget.userEmail});
+    final headers = {'Content-Type': 'application/json'};
+
+    try {
+      final response = await http.post(url, headers: headers, body: body);
+      if (response.statusCode == 200) {
+        final List<dynamic> locations = jsonDecode(response.body);
+        _addMarkers(locations); // Add markers for each location received from the backend
+      } else {
+        print('Failed to fetch locations. Status code: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching locations: $e');
     }
   }
 
@@ -74,6 +82,14 @@ class _EditMandatoryState extends State<EditMandatory> {
       _markers.add(marker);
     }
     setState(() {});
+  }
+
+  void _deleteSelectedMarker() {
+    if (_selectedLocation != null) {
+      _markers.removeWhere((marker) => marker.position == _selectedLocation);
+      _selectedLocation = null;
+      setState(() {});
+    }
   }
 
   @override
@@ -149,6 +165,7 @@ class _EditMandatoryState extends State<EditMandatory> {
                     minimumSize: Size(size.height * 0.28, size.height * 0.08),
                   ),
                 ),
+                SizedBox(height: size.height * 0.01),
               ],
             ),
           ),
@@ -157,3 +174,8 @@ class _EditMandatoryState extends State<EditMandatory> {
     );
   }
 }
+
+
+
+
+
