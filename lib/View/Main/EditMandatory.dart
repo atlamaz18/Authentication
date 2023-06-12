@@ -145,7 +145,7 @@ class _EditMandatoryState extends State<EditMandatory> {
                   context,
                   MaterialPageRoute(
                     builder: (context) {
-                      return SettingsPage(userEmail: 'userEmail');
+                      return SettingsPage(userEmail: widget.userEmail);
                     },
                   ),
                 );

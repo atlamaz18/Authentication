@@ -54,7 +54,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 context,
                 MaterialPageRoute(
                   builder: (context) {
-                    return MainLayout(userEmail: 'userEmail');
+                    return MainLayout(userEmail: widget.userEmail);
                   },
                 ),
               );
@@ -78,7 +78,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     context,
                     MaterialPageRoute(
                       builder: (context) {
-                        return MainLayout(userEmail: 'userEmail');
+                        return MainLayout(userEmail: widget.userEmail);
                       },
                     ),
                   );
@@ -98,7 +98,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     context,
                     MaterialPageRoute(
                       builder: (context) {
-                        return MainLayout(userEmail: 'userEmail');
+                        return MainLayout(userEmail: widget.userEmail);
                       },
                     ),
                   );
@@ -118,7 +118,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     context,
                     MaterialPageRoute(
                       builder: (context) {
-                        return EditMandatory(userEmail: 'userEmail');
+                        return EditMandatory(userEmail: widget.userEmail);
                       },
                     ),
                   );
