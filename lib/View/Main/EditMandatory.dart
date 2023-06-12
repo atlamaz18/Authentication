@@ -122,7 +122,7 @@ class _EditMandatoryState extends State<EditMandatory> {
             title: 'New Location',
           ),
         );
-        _markers.add(marker);
+        _markers = _markers.union(Set<Marker>.from([..._dynamicMarkers, marker]));
         _dynamicMarkers.add(marker);
         setState(() {});
       } else {
