@@ -6,9 +6,9 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:permission_handler/permission_handler.dart';
 
-
 class EditMandatory extends StatefulWidget {
   const EditMandatory({Key? key, required this.userEmail}) : super(key: key);
+
   final String userEmail;
 
   @override
@@ -16,19 +16,69 @@ class EditMandatory extends StatefulWidget {
 }
 
 class _EditMandatoryState extends State<EditMandatory> {
-  Completer<GoogleMapController> _controller = Completer();
-
   static const LatLng _center = const LatLng(41.105000, 29.025000);
+
+  final List<Marker> _list = const [
+    Marker(
+      markerId: MarkerId('1'),
+      position: _center,
+      infoWindow: InfoWindow(
+        title: 'Current Location',
+      ),
+    ),
+    Marker(
+      markerId: MarkerId('2'),
+      position: LatLng(41, 29),
+      infoWindow: InfoWindow(
+        title: 'Mandatory Location',
+      ),
+    ),
+  ];
+
+  Completer<GoogleMapController> _controller = Completer();
+  LatLng? _selectedLocation;
+  Set<Marker> _markers = {};
+
+  @override
+  void initState() {
+    super.initState();
+    _markers = Set<Marker>.from(_list);
+    _fetchLocations(); // Fetch location data from the backend
+  }
 
   void _onMapCreated(GoogleMapController controller) {
     _controller.complete(controller);
   }
 
+  Future<void> _fetchLocations() async {
+    // Simulating API call to retrieve location data from the backend
+    final response = await http.get(Uri.parse('ANIL'));
+    if (response.statusCode == 200) {
+      final List<dynamic> locations = jsonDecode(response.body);
+      _addMarkers(locations); // Add markers for each location received from the backend
+    } else {
+      print('Failed to fetch locations. Status code: ${response.statusCode}');
+    }
+  }
+
+  void _addMarkers(List<dynamic> locations) {
+    for (var location in locations) {
+      final LatLng latLng = LatLng(location['latitude'], location['longitude']);
+      final marker = Marker(
+        markerId: MarkerId(location['id'].toString()),
+        position: latLng,
+        infoWindow: InfoWindow(
+          title: 'Location ${location['id']}',
+        ),
+      );
+      _markers.add(marker);
+    }
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    LatLng? _selectedLocation;
-    Set<Marker> _markers = {};
 
     return MaterialApp(
       home: Scaffold(
@@ -72,85 +122,28 @@ class _EditMandatoryState extends State<EditMandatory> {
                     markers: _markers,
                     onTap: (LatLng location) {
                       setState(() {
-                        _markers.clear();
+                        _selectedLocation = location;
                         _markers.add(
                           Marker(
                             markerId: MarkerId('selected_location'),
                             position: location,
-                            icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
                             infoWindow: InfoWindow(
-                              title: 'Location',
-                              snippet: 'My Custom Subtitle',
+                              title: 'Selected Location',
                             ),
                           ),
                         );
-                        _selectedLocation = location;
-                        print(location);
                       });
                     },
                   ),
                 ),
                 SizedBox(height: size.height * 0.05),
-                Builder(
-                  builder: (BuildContext context) {
-                    return ElevatedButton(
-                      onPressed: () async {
-                        print(_selectedLocation);
-                        if (_selectedLocation != null) {
-                          print("Not null");
-                          var response = await http.post(
-                            Uri.parse('http://your-server.com/update-location'), // replace with your server URL
-                            body: jsonEncode({
-                              'latitude': _selectedLocation!.latitude,
-                              'longitude': _selectedLocation!.longitude,
-                            }),
-                          );
-                          if (response.statusCode == 200) {
-                            print('Location updated');
-                          } else {
-                            print('Failed to update location');
-                          }
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Please select a location on the map.'),
-                            ),
-                          );
-                        }
-                      },
-                      child: Text('Add Location'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0XFF19586A),
-                        minimumSize: Size(size.height * 0.28, size.height * 0.08),
-                      ),
-                    );
-                  },
-                ),
-                SizedBox(height: size.height * 0.01),
                 ElevatedButton(
-                  onPressed: () async {
+                  onPressed: () {
                     if (_selectedLocation != null) {
-                      var response = await http.post(
-                        Uri.parse('http://your-server.com/update-location'), // replace with your server URL
-                        body: jsonEncode({
-                          'latitude': _selectedLocation!.latitude,
-                          'longitude': _selectedLocation!.longitude,
-                        }),
-                      );
-                      if (response.statusCode == 200) {
-                        print('Location updated');
-                      } else {
-                        print('Failed to update location');
-                      }
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Please select a location on the map.'),
-                        ),
-                      );
+                      print('Selected Location: ${_selectedLocation!.latitude}, ${_selectedLocation!.longitude}');
                     }
                   },
-                  child: Text('Delete Location'),
+                  child: Text('Add Location'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0XFF19586A),
                     minimumSize: Size(size.height * 0.28, size.height * 0.08),
