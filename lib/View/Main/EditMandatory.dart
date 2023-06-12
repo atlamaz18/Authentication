@@ -5,6 +5,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class EditMandatory extends StatefulWidget {
   const EditMandatory({Key? key, required this.userEmail}) : super(key: key);
@@ -53,7 +54,9 @@ class _EditMandatoryState extends State<EditMandatory> {
 
   Future<void> _fetchLocations() async {
     // Simulating API call to retrieve location data from the backend
-    final url = Uri.parse('ANIL');
+    final baseUrl = dotenv.env['BASE_URL'];
+    final finalurl = (baseUrl != null ? baseUrl : 'http://127.0.0.1') + '/get_mandatory_locations/';
+    final url = Uri.parse(finalurl);
     final body = jsonEncode({'email': widget.userEmail});
     final headers = {'Content-Type': 'application/json'};
 
@@ -100,9 +103,10 @@ class _EditMandatoryState extends State<EditMandatory> {
     if (_selectedLocation != null) {
       final latitude = _selectedLocation!.latitude;
       final longitude = _selectedLocation!.longitude;
-
+      final baseUrl = dotenv.env['BASE_URL'];
+      final finalurl = (baseUrl != null ? baseUrl : 'http://127.0.0.1') + '/add_mandatory_location/';
       final response = await http.post(
-        Uri.parse('Burak'),
+        Uri.parse(finalurl),
         body: jsonEncode({
           'email': widget.userEmail,
           'latitude': latitude,

@@ -1,6 +1,14 @@
 from geopy.geocoders import Nominatim
 from geopy.distance import great_circle
 from datetime import datetime
+from rest_framework import serializers
+from .models import MandatoryLocation
+
+class MandatoryLocationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MandatoryLocation
+        fields = ['latitude', 'longitude']
+
 
 # Takes a coordinate in form of [longtitute, latitude] and returns geographic location as dictionary.
 def coordinateToString(coord):

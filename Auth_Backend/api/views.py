@@ -9,7 +9,7 @@ from django.http import JsonResponse
 import json
 from datetime import datetime
 from .models import User, UserLocation
-from .helpers import coordinateToString
+from .helpers import coordinateToString, MandatoryLocationSerializer
 
 @api_view(['POST'])
 def create_user(request):
@@ -98,3 +98,35 @@ def change_settings_view(request):
         return JsonResponse({'status': 'success'}, status=200)
     else:
         return JsonResponse({'status': 'error', 'error': 'Invalid request'}, status=400)
+
+@api_view(['POST'])
+def get_mandatory_locations_view(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        print(data)
+        email = data.get('email')
+        User = get_user_model()
+        user = User.objects.get(email=email)
+        mandatory_locs = user.fetch_mandatory_locations()
+        serializer = MandatoryLocationSerializer(mandatory_locs, many=True)
+        print(serializer.data)
+        return Response(serializer.data)
+
+@api_view(['POST'])
+def add_mandatory_location_view(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            print(data)
+            email = data.get('email')
+            User = get_user_model()
+            user = User.objects.get(email=email)
+            user.add_mandatory_location(data['latitude'], data['longitude'])
+            return JsonResponse({'status': 'success'}, status=200)
+        except KeyError:
+            return JsonResponse({'error': 'Bad request Key'}, status=400)
+        except ValueError:
+            return JsonResponse({'error': 'Bad request Value'}, status=400)
+    
+
+
