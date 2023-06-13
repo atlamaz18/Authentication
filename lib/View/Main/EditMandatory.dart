@@ -91,12 +91,14 @@ class _EditMandatoryState extends State<EditMandatory> {
 }
 
   void _deleteSelectedMarker() async {
+    print("Butona bastın, fonksiyona girdi");
     if (_selectedLocation != null) {
+      print("Null olmadığını anladık");
       final latitude = _selectedLocation!.latitude;
       final longitude = _selectedLocation!.longitude;
       final baseUrl = dotenv.env['BASE_URL'];
       final finalurl = (baseUrl != null ? baseUrl : 'http://127.0.0.1') + '/delete_mandatory_location/';
-
+      print("Backende data yolladı");
       final response = await http.post(
         Uri.parse(finalurl),
         body: jsonEncode({
@@ -105,7 +107,7 @@ class _EditMandatoryState extends State<EditMandatory> {
           'longitude': longitude,
         }),
       );
-
+      print("Backendten geri geldi");
       if (response.statusCode == 200) {
         _markers.removeWhere((marker) =>
         marker.position.latitude == latitude &&
@@ -120,6 +122,8 @@ class _EditMandatoryState extends State<EditMandatory> {
       } else {
         print('Failed to delete location. Status code: ${response.statusCode}');
       }
+      print("Status code doğru, dynamic marker okey");
+
     }
     else{
       final latitude = _selectedLocation!.latitude;
