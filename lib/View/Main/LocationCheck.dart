@@ -243,15 +243,8 @@ class _LocationLayoutState extends State<LocationLayout> {
                         context: context,
                         builder: (context) => AlertDialog(
                           title: const Text('Location Authentication Error', textAlign: TextAlign.center,),
-                          content: const Text('It is not possible to rach that far that quickly', textAlign: TextAlign.center,),
+                          content: const Text('It is not possible to reach that far that quickly', textAlign: TextAlign.center,),
                         ),);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) {
-                            return MainLayout(userEmail: widget.userEmail);},
-                        ),
-                      );
                     }
                   },
                   child: Stack(
