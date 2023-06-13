@@ -8,4 +8,5 @@ urlpatterns = [
     path('change_settings/', views.change_settings_view, name='change_settings'),
     path('get_mandatory_locations/', views.get_mandatory_locations_view, name='get_mandatory_locations'),
     path('add_mandatory_location/', views.add_mandatory_location_view, name='add_mandatory_location'),
+    path('delete_mandatory_location/', views.delete_mandatory_location, name='delete_mandatory_location'),
 ]

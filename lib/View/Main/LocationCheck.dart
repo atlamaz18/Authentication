@@ -187,7 +187,7 @@ class _LocationLayoutState extends State<LocationLayout> {
                   //population = decodedResponse[0]["population"];
 
                   //ANIL, burada backendten eğer konum doğrulama geçildiyse true, geçilmediyse false gönermen lazım, aşağıda nedenini anlattım
-                  //possible = decodedResponse[0]["possible"];
+                  possible = decodedResponse["possible"];
 
                   setState(() {
                     locationMessage = 'Current Location: $cur_loc Date: $date\n';

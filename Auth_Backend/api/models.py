@@ -20,9 +20,19 @@ class User(AbstractBaseUser):
     def add_mandatory_location(self, latitude, longitude):
         MandatoryLocation.objects.create(user=self, latitude=latitude, longitude=longitude)
         self.mandatory_count += 1
+        self.save()
     
     def fetch_mandatory_locations(self):
         return self.mandatory_locations.all()
+
+    def delete_mandatory_location(self, latitude, longitude):
+        error = 0.00001
+        loc = self.mandatory_locations.get(
+            latitude__range=(latitude - error, latitude + error), 
+            longitude__range=(longitude - error, longitude + error)
+        )
+        loc.delete()
+        return 1
 
 
 

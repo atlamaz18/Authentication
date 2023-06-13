@@ -28,18 +28,33 @@ def calcDistance(cord1, cord2):
 
 # Adjust
 def is_possible_travel(prev_location, curr_location, prev_date_str, curr_date_str, speed=500):
-    date_format = "%Y-%m-%d - %H:%M:%S" 
-
     # Calculate the time difference in hours
-    prev_date = datetime.strptime(prev_date_str, date_format)
-    curr_date = datetime.strptime(curr_date_str, date_format)
+    prev_date = parse_date(prev_date_str)
+    curr_date = parse_date(curr_date_str)
     time_diff = (curr_date - prev_date).total_seconds() / 3600
-
     # Calculate the maximum distance that could be traveled
     max_distance = speed * time_diff
 
     # Calculate the actual distance
     actual_distance = calcDistance(prev_location, curr_location)
-
+    if actual_distance < 3:
+        return True
     # Return whether it is possible to travel the actual distance in the time difference
     return actual_distance <= max_distance
+
+def check_within_distance(current_location, location_list):
+    threshold_km = 3
+    for location in location_list:
+        if calcDistance(current_location, [location.latitude, location.longitude]) <= threshold_km:
+            return True
+    return False
+
+def parse_date(date_str):
+    formats = ["%Y-%m-%d – %H:%M:%S", "%Y-%m-%d - %H:%M:%S"]
+
+    for fmt in formats:
+        try:
+            return datetime.strptime(date_str, fmt)
+        except ValueError:
+            continue
+    raise ValueError(f"No valid date format found for {date_str}")
