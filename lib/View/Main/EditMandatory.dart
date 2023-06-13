@@ -108,30 +108,14 @@ class _EditMandatoryState extends State<EditMandatory> {
 
       if (response.statusCode == 200) {
         _markers.removeWhere((marker) => marker.position == _selectedLocation);
-        _dynamicMarkers.removeWhere((marker) => marker.position == _selectedLocation);
         _selectedLocation = null;
-        setState(() {});
         setState(() {
-          _dynamicMarkers = _dynamicMarkers.sublist(0, _dynamicMarkers.length - 1);
+          _fetchLocations(); // Update the dynamic markers from the backend after deletion
         });
       } else {
         print('Failed to delete location. Status code: ${response.statusCode}');
       }
     }
-    // Code to handle deletion of locations retrieved from the database
-    //ANIL bu kod line'ı ekledim gece deneriz
-    Marker? deletedLocation;
-    for (var marker in _dynamicMarkers) {
-      if (marker.position == _selectedLocation) {
-        deletedLocation = marker;
-        break;
-      }
-    }
-    if (deletedLocation != null) {
-      _dynamicMarkers.remove(deletedLocation);
-      setState(() {});
-    }
-    //Burada bitiyor ekleme
   }
 
   Future<void> _addLocation() async {
