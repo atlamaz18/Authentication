@@ -1,8 +1,10 @@
+import 'package:authentication/View/Main/BiometricCheck.dart';
 import 'package:authentication/View/Main/EditProfile.dart';
 import 'package:authentication/View/Main/MainLayout.dart';
 import 'package:authentication/View/Main/EditMandatory.dart';
 import 'package:flutter/material.dart';
 import 'package:settings_ui/settings_ui.dart';
+import 'package:local_auth/local_auth.dart';
 
 import 'package:http/http.dart' as http;
 import "dart:convert";
@@ -40,6 +42,8 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     bool _fingerprint = false;
     bool _facescan = false;
+    final LocalAuthentication auth = LocalAuthentication();
+
 
     return Scaffold(
       appBar: AppBar(
@@ -78,7 +82,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     context,
                     MaterialPageRoute(
                       builder: (context) {
-                        return MainLayout(userEmail: widget.userEmail);
+                        return BiometricCheck(userEmail: widget.userEmail, latitude: 0, longitude: 0, population: 0);
                       },
                     ),
                   );
@@ -98,7 +102,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     context,
                     MaterialPageRoute(
                       builder: (context) {
-                        return MainLayout(userEmail: widget.userEmail);
+                        return BiometricCheck(userEmail: widget.userEmail, latitude: 0, longitude: 0, population: 0);
                       },
                     ),
                   );
@@ -110,7 +114,7 @@ class _SettingsPageState extends State<SettingsPage> {
             title: const Text('User-defined Location'),
             tiles: <SettingsTile>[
               SettingsTile.navigation(
-                leading: const Icon(Icons.face_retouching_natural),
+                leading: const Icon(Icons.edit),
                 title: const Text('Edit Mandatory Loc'),
                 value: const Text('Add or Delete both'),
                 onPressed: (BuildContext context) {
@@ -122,20 +126,6 @@ class _SettingsPageState extends State<SettingsPage> {
                       },
                     ),
                   );
-                },
-              ),
-              SettingsTile.navigation(
-                leading: const Icon(Icons.person_outline),
-                title: const Text('Add Mandatory Data'),
-                onPressed: (BuildContext context) {
-                  Mandatory('AddMandatory');
-                },
-              ),
-              SettingsTile.navigation(
-                leading: const Icon(Icons.person_outline),
-                title: const Text('Delete Mandatory Data'),
-                onPressed: (BuildContext context) {
-                  Mandatory('DeleteMandatory');
                 },
               ),
 

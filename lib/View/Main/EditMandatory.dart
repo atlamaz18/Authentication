@@ -91,35 +91,46 @@ class _EditMandatoryState extends State<EditMandatory> {
 }
 
   void _deleteSelectedMarker(double? latitude, double? longitude) async {
-    print("Butona bastın, fonksiyona girdi");
     if (latitude != null && longitude != null) {
-      print("Null olmadığını anladık");
-      final baseUrl = dotenv.env['BASE_URL'];
-      final finalurl = (baseUrl != null ? baseUrl : 'http://127.0.0.1') + '/delete_mandatory_location/';
+      final threshold = 0.000001; // Adjust the threshold value as needed
 
-      print("Backende data yolladı");
-      final response = await http.post(
-        Uri.parse(finalurl),
-        body: jsonEncode({
-          'email': widget.userEmail,
-          'latitude': latitude,
-          'longitude': longitude,
-        }),
-      );
+      final selectedLocation = LatLng(latitude, longitude);
+      bool markerFound = false;
 
-      if (response.statusCode == 200) {
-        _markers.removeWhere((marker) => marker.position == _selectedLocation);
-        _dynamicMarkers.removeWhere((marker) => marker.position == _selectedLocation);
-        _selectedLocation = null;
-        setState(() {
-          _dynamicMarkers = _dynamicMarkers.sublist(0, _dynamicMarkers.length - 1);
-        });
-      } else {
-        print('Failed to delete location. Status code: ${response.statusCode}');
+      for (final marker in _markers) {
+        if ((marker.position.latitude - selectedLocation.latitude).abs() < threshold &&
+            (marker.position.longitude - selectedLocation.longitude).abs() < threshold) {
+          final baseUrl = dotenv.env['BASE_URL'];
+          final finalurl = (baseUrl != null ? baseUrl : 'http://127.0.0.1') + '/delete_mandatory_location/';
+
+          final response = await http.post(
+            Uri.parse(finalurl),
+            body: jsonEncode({
+              'email': widget.userEmail,
+              'latitude': latitude,
+              'longitude': longitude,
+            }),
+          );
+
+          if (response.statusCode == 200) {
+            _markers.remove(marker);
+            _dynamicMarkers.remove(marker);
+            _selectedLocation = null;
+            setState(() {
+              _dynamicMarkers = _dynamicMarkers.sublist(0, _dynamicMarkers.length - 1);
+            });
+            markerFound = true;
+            break;
+          } else {
+            print('Failed to delete location. Status code: ${response.statusCode}');
+          }
+        }
+      }
+
+      if (!markerFound) {
+        print('Matching marker not found');
       }
     }
-    print("Null olduğunu anladık");
-
   }
 
 
@@ -231,6 +242,9 @@ class _EditMandatoryState extends State<EditMandatory> {
                   onPressed: () {
                     if (_selectedLocation != null) {
                       _deleteSelectedMarker(_selectedLocation!.latitude, _selectedLocation!.longitude);
+                    }
+                    else{
+                      print("ANIL, konum seçinde Null gönderiyor neden bilmiyorum");
                     }
                   },
                   child: Text('Delete Location'),
