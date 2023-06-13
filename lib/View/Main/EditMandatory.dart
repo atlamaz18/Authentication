@@ -107,16 +107,37 @@ class _EditMandatoryState extends State<EditMandatory> {
       );
 
       if (response.statusCode == 200) {
-        _markers.removeWhere((marker) => marker.position == _selectedLocation);
+        _markers.removeWhere((marker) =>
+        marker.position.latitude == latitude &&
+            marker.position.longitude == longitude);
+        _dynamicMarkers.removeWhere((marker) =>
+        marker.position.latitude == latitude &&
+            marker.position.longitude == longitude);
         _selectedLocation = null;
         setState(() {
-          _fetchLocations(); // Update the dynamic markers from the backend after deletion
+          _dynamicMarkers = _dynamicMarkers.sublist(0, _dynamicMarkers.length - 1);
         });
       } else {
         print('Failed to delete location. Status code: ${response.statusCode}');
       }
     }
+    else{
+      final latitude = _selectedLocation!.latitude;
+      final longitude = _selectedLocation!.longitude;
+      final baseUrl = dotenv.env['BASE_URL'];
+      final finalurl = (baseUrl != null ? baseUrl : 'http://127.0.0.1') + '/delete_mandatory_location/';
+
+      final response = await http.post(
+        Uri.parse(finalurl),
+        body: jsonEncode({
+          'email': "ANIL HATA ŞU",
+          'latitude': "seçili konum",
+          'longitude': "null olduğu için gödnermiyor",
+        }),
+      );
+    }
   }
+
 
   Future<void> _addLocation() async {
   if (_selectedLocation != null) {
